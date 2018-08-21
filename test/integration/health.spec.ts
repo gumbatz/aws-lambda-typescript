@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import * as rp from 'request-promise-native';
 
-import { HttpStatusCode } from '../../shared/http-status-codes';
+import { httpStatusCode } from '../../shared/http-status-codes';
 import { GetHealthCheckResult } from '../../src/health/health.interfaces';
 import { ApiClient } from './api-client';
 
@@ -16,7 +16,7 @@ describe('Health check', () => {
   });
 
   it('should return 200 OK', async () => {
-    expect(response.statusCode).to.eql(HttpStatusCode.Ok);
+    expect(response.statusCode).to.eql(httpStatusCode.Ok);
   });
 
   it('should return success=true', async () => {

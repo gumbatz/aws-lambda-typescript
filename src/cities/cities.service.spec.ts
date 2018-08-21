@@ -24,7 +24,7 @@ describe('CitiesService', () => {
       country: chance.country(),
       id: chance.natural(),
       name: chance.city(),
-      populationDensity: chance.natural()
+      populationDensity: chance.natural(),
     };
   });
 
@@ -57,7 +57,8 @@ describe('CitiesService', () => {
 
       when(citiesRepositoryMock.exists(testCity.id)).thenReturn(true);
       when(citiesRepositoryMock.hasAccess(testCity.id)).thenReturn(true);
-      when(citiesRepositoryMock.getCity(testCity.id, testCity.country)).thenReturn(hungarianTestCity);
+      when(citiesRepositoryMock.getCity(testCity.id, testCity.country))
+        .thenReturn(hungarianTestCity);
 
       const result: GetCityResult = await service.getCity(testCity.id);
       expect(result.city.country).to.equal(hungarianTestCity.country);

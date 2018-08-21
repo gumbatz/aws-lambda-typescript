@@ -1,11 +1,9 @@
 import { expect } from 'chai';
 import * as rp from 'request-promise-native';
 
-import { HttpStatusCode } from '../../shared/http-status-codes';
+import { httpStatusCode } from '../../shared/http-status-codes';
 import { GetSwaggerResult } from '../../src/swagger/swagger.interfaces';
 import { ApiClient } from './api-client';
-
-// tslint:disable no-unused-expression (Generates false alarms for mocha "undefined" function.)
 
 describe('Swagger', () => {
   let response: rp.FullResponse;
@@ -18,7 +16,7 @@ describe('Swagger', () => {
   });
 
   it('should return 200 OK', async () => {
-    expect(response.statusCode).to.eql(HttpStatusCode.Ok);
+    expect(response.statusCode).to.eql(httpStatusCode.Ok);
   });
 
   it('should return API info', async () => {

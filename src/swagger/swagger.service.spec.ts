@@ -3,8 +3,10 @@ import { expect } from 'chai';
 import { Chance } from 'chance';
 import { instance, mock, reset, when } from 'ts-mockito';
 
-import { ErrorCode } from '../../shared/error-codes';
-import { ConfigurationErrorResult, ErrorResult, ForbiddenResult, InternalServerErrorResult, NotFoundResult } from '../../shared/errors';
+import { errorCode } from '../../shared/error-codes';
+import {
+  ConfigurationErrorResult, ErrorResult, ForbiddenResult, InternalServerErrorResult, NotFoundResult,
+} from '../../shared/errors';
 import { GetSwaggerResult } from './swagger.interfaces';
 import { SwaggerRepository } from './swagger.repository';
 import { SwaggerService } from './swagger.service';
@@ -43,19 +45,19 @@ describe('SwaggerService', () => {
           '/cities': {
             get: {},
             options: {},
-            post: {}
+            post: {},
           },
           '/continents': {
             get: {},
             options: {},
-            post: {}
+            post: {},
           },
           '/countries': {
-            get: {}
+            get: {},
           },
-          '/swagger.json': {}
-        }
-      }
+          '/swagger.json': {},
+        },
+      },
     };
     testSwaggerDocJson = JSON.stringify(testData.swaggerDoc);
 
@@ -67,8 +69,10 @@ describe('SwaggerService', () => {
 
   describe('getSwaggerDescription function', () => {
     it('should resolve with API info from the environment variables', async () => {
-      when(swaggerRepositoryMock.getRestApiId(testData.stageName, testData.restApiName)).thenReturn(Promise.resolve(testData.restApiId));
-      when(swaggerRepositoryMock.getSwaggerDescription(testData.restApiId, testData.stageName)).thenReturn(Promise.resolve(testSwaggerDocJson));
+      when(swaggerRepositoryMock.getRestApiId(testData.stageName, testData.restApiName))
+        .thenReturn(Promise.resolve(testData.restApiId));
+      when(swaggerRepositoryMock.getSwaggerDescription(testData.restApiId, testData.stageName))
+        .thenReturn(Promise.resolve(testSwaggerDocJson));
 
       const result: GetSwaggerResult = await service.getSwaggerDescription();
       expect(result.info.title).to.equal(testData.swaggerDoc.info.title);
@@ -81,16 +85,20 @@ describe('SwaggerService', () => {
     });
 
     it('should resolve without the swagger.json endpoint', async () => {
-      when(swaggerRepositoryMock.getRestApiId(testData.stageName, testData.restApiName)).thenReturn(Promise.resolve(testData.restApiId));
-      when(swaggerRepositoryMock.getSwaggerDescription(testData.restApiId, testData.stageName)).thenReturn(Promise.resolve(testSwaggerDocJson));
+      when(swaggerRepositoryMock.getRestApiId(testData.stageName, testData.restApiName))
+        .thenReturn(Promise.resolve(testData.restApiId));
+      when(swaggerRepositoryMock.getSwaggerDescription(testData.restApiId, testData.stageName))
+        .thenReturn(Promise.resolve(testSwaggerDocJson));
 
       const result: GetSwaggerResult = await service.getSwaggerDescription();
       expect(result.paths['/swagger.json']).to.be.undefined;
     });
 
     it('should resolve without the OPTIONS endpoints', async () => {
-      when(swaggerRepositoryMock.getRestApiId(testData.stageName, testData.restApiName)).thenReturn(Promise.resolve(testData.restApiId));
-      when(swaggerRepositoryMock.getSwaggerDescription(testData.restApiId, testData.stageName)).thenReturn(Promise.resolve(testSwaggerDocJson));
+      when(swaggerRepositoryMock.getRestApiId(testData.stageName, testData.restApiName))
+        .thenReturn(Promise.resolve(testData.restApiId));
+      when(swaggerRepositoryMock.getSwaggerDescription(testData.restApiId, testData.stageName))
+        .thenReturn(Promise.resolve(testSwaggerDocJson));
 
       const result: GetSwaggerResult = await service.getSwaggerDescription();
       expect(result.paths['/cities'].options).to.be.undefined;
@@ -103,7 +111,7 @@ describe('SwaggerService', () => {
       service.getSwaggerDescription()
         .catch((error: ErrorResult) => {
           expect(error).instanceof(ConfigurationErrorResult);
-          expect(error.code).to.equal(ErrorCode.MissingEnv);
+          expect(error.code).to.equal(errorCode.MissingEnv);
           expect(error.description).to.include('REST_API_NAME');
         });
     });
@@ -114,7 +122,7 @@ describe('SwaggerService', () => {
       service.getSwaggerDescription()
         .catch((error: ErrorResult) => {
           expect(error).instanceof(ConfigurationErrorResult);
-          expect(error.code).to.equal(ErrorCode.MissingEnv);
+          expect(error.code).to.equal(errorCode.MissingEnv);
           expect(error.description).to.include('STAGE_NAME');
         });
     });
@@ -125,7 +133,7 @@ describe('SwaggerService', () => {
       service.getSwaggerDescription()
         .catch((error: ErrorResult) => {
           expect(error).instanceof(ConfigurationErrorResult);
-          expect(error.code).to.equal(ErrorCode.MissingEnv);
+          expect(error.code).to.equal(errorCode.MissingEnv);
           expect(error.description).to.include('API_INFO_TITLE');
         });
     });
@@ -136,35 +144,38 @@ describe('SwaggerService', () => {
       service.getSwaggerDescription()
         .catch((error: ErrorResult) => {
           expect(error).instanceof(ConfigurationErrorResult);
-          expect(error.code).to.equal(ErrorCode.MissingEnv);
+          expect(error.code).to.equal(errorCode.MissingEnv);
           expect(error.description).to.include('API_INFO_VERSION');
         });
     });
 
     it('should reject for non-existing API', () => {
-      when(swaggerRepositoryMock.getRestApiId(testData.stageName, testData.restApiName)).thenReturn(Promise.resolve(''));
+      when(swaggerRepositoryMock.getRestApiId(testData.stageName, testData.restApiName))
+        .thenReturn(Promise.resolve(''));
 
       service.getSwaggerDescription()
         .catch((error: ErrorResult) => {
           expect(error).instanceof(NotFoundResult);
-          expect(error.code).to.equal(ErrorCode.InvalidName);
+          expect(error.code).to.equal(errorCode.InvalidName);
         });
     });
 
     it('should reject for insufficient permissions', () => {
       const awsError: AWSError = <AWSError> new Error();
       awsError.code = 'AccessDeniedException';
-      when(swaggerRepositoryMock.getRestApiId(testData.stageName, testData.restApiName)).thenReturn(Promise.reject(awsError));
+      when(swaggerRepositoryMock.getRestApiId(testData.stageName, testData.restApiName))
+        .thenReturn(Promise.reject(awsError));
 
       service.getSwaggerDescription()
         .catch((error: ErrorResult) => {
           expect(error).instanceof(ForbiddenResult);
-          expect(error.code).to.equal(ErrorCode.MissingPermission);
+          expect(error.code).to.equal(errorCode.MissingPermission);
         });
     });
 
     it('should reject if the getRestApiId repository call fails', () => {
-      when(swaggerRepositoryMock.getRestApiId(testData.stageName, testData.restApiName)).thenReturn(Promise.reject(new Error()));
+      when(swaggerRepositoryMock.getRestApiId(testData.stageName, testData.restApiName))
+        .thenReturn(Promise.reject(new Error()));
 
       service.getSwaggerDescription()
         .catch((error: Error) => {
@@ -173,8 +184,10 @@ describe('SwaggerService', () => {
     });
 
     it('should reject if the getSwaggerDescription repository call fails', () => {
-      when(swaggerRepositoryMock.getRestApiId(testData.stageName, testData.restApiName)).thenReturn(Promise.resolve(testData.restApiId));
-      when(swaggerRepositoryMock.getSwaggerDescription(testData.restApiId, testData.stageName)).thenReturn(Promise.reject(new Error()));
+      when(swaggerRepositoryMock.getRestApiId(testData.stageName, testData.restApiName))
+        .thenReturn(Promise.resolve(testData.restApiId));
+      when(swaggerRepositoryMock.getSwaggerDescription(testData.restApiId, testData.stageName))
+        .thenReturn(Promise.reject(new Error()));
 
       service.getSwaggerDescription()
         .catch((error: Error) => {

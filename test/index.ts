@@ -1,12 +1,15 @@
-import { ApiContext, ApiEvent, ApiHandler, ApiResponse, ErrorResponseBody } from '../shared/api.interfaces';
+import { ApiContext, ApiEvent, ApiHandler, ApiResponse, ErrorResponseBody }
+   from '../shared/api.interfaces';
 import { ApiErrorResponseParsed, ApiResponseParsed, PathParameter } from './test.interfaces';
 
-type SuccessCaller = <T> (handler: ApiHandler, pathParameters?: PathParameter) => Promise<ApiResponseParsed<T>>;
-type FailureCaller = (handler: ApiHandler, pathParameters?: PathParameter) => Promise<ApiErrorResponseParsed>;
+type SuccessCaller = <T> (handler: ApiHandler, pathParameters?: PathParameter)
+  => Promise<ApiResponseParsed<T>>;
+type FailureCaller = (handler: ApiHandler, pathParameters?: PathParameter)
+  => Promise<ApiErrorResponseParsed>;
 
-// tslint:disable-next-line arrow-return-shorthand (Long function body.)
-export const callSuccess: SuccessCaller = <T>(handler: ApiHandler, pathParameters?: PathParameter): Promise<ApiResponseParsed<T>> => {
-  // tslint:disable-next-line typedef (Well-known constructor.)
+export const callSuccess: SuccessCaller = <T>(
+  handler: ApiHandler, pathParameters?: PathParameter,
+): Promise<ApiResponseParsed<T>> => {
   return new Promise((resolve, reject) => {
     const event: ApiEvent = <ApiEvent> {};
     if (pathParameters) {
@@ -26,9 +29,9 @@ export const callSuccess: SuccessCaller = <T>(handler: ApiHandler, pathParameter
   });
 };
 
-// tslint:disable-next-line arrow-return-shorthand (Long function body.)
-export const callFailure: FailureCaller = (handler: ApiHandler, pathParameters?: PathParameter): Promise<ApiErrorResponseParsed> => {
-  // tslint:disable-next-line typedef (Well-known constructor.)
+export const callFailure: FailureCaller = (
+  handler: ApiHandler, pathParameters?: PathParameter,
+): Promise<ApiErrorResponseParsed> => {
   return new Promise((resolve, reject) => {
     const event: ApiEvent = <ApiEvent> {};
     if (pathParameters) {

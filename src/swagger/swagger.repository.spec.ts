@@ -4,8 +4,6 @@ import { Chance } from 'chance';
 
 import { SwaggerRepository } from './swagger.repository';
 
-// tslint:disable no-unused-expression (Generates false alarms for mocha "undefined" function.)
-
 const chance: Chance.Chance = new Chance();
 
 describe('SwaggerRepository', () => {
@@ -22,7 +20,7 @@ describe('SwaggerRepository', () => {
       restApiId: chance.word(),
       restApiName: chance.word(),
       stageName: chance.word(),
-      swaggerDescription: chance.sentence()
+      swaggerDescription: chance.sentence(),
     };
   });
 
@@ -34,7 +32,7 @@ describe('SwaggerRepository', () => {
         { id: chance.word(), name: testData.stageName },
         { id: chance.word(), name: testData.restApiName },
         { id: testData.restApiId, name: `${testData.stageName}-${testData.restApiName}` },
-        { id: chance.word(), name: `${testData.stageName}-${testData.restApiName}` }
+        { id: chance.word(), name: `${testData.stageName}-${testData.restApiName}` },
       ];
       createRepo(restApis);
 
@@ -47,7 +45,7 @@ describe('SwaggerRepository', () => {
         { id: undefined, name: testData.stageName },
         { id: undefined, name: testData.restApiName },
         { id: chance.word(), name: testData.stageName },
-        { id: chance.word(), name: testData.restApiName }
+        { id: chance.word(), name: testData.restApiName },
       ];
       createRepo(restApis);
 
@@ -59,7 +57,8 @@ describe('SwaggerRepository', () => {
       const restApis: APIGateway.RestApi[] = [];
       createRepo(restApis);
 
-      const id: undefined = <undefined> await repo.getRestApiId(testData.stageName, testData.restApiName);
+      const id: undefined =
+        <undefined> await repo.getRestApiId(testData.stageName, testData.restApiName);
       expect(id).to.be.undefined;
     });
 
@@ -80,7 +79,8 @@ describe('SwaggerRepository', () => {
     it('should resolve with the Swagger description', async () => {
       createRepo([], testData.swaggerDescription);
 
-      const swaggerDescription: string = await repo.getSwaggerDescription(testData.restApiId, testData.stageName);
+      const swaggerDescription: string =
+        await repo.getSwaggerDescription(testData.restApiId, testData.stageName);
       expect(swaggerDescription).to.equal(testData.swaggerDescription);
     });
 
@@ -96,21 +96,27 @@ describe('SwaggerRepository', () => {
     });
   });
 
-  function createRepo(restApis: APIGateway.RestApi[], swaggerDescription?: string, error?: AWSError): void {
-    // NOTE: Manual mocking is used here, because mocking of the types in the AWS SDK is tricky, due to the fact that the SDK builds those objects dynamically based on a JSON definition.
+  function createRepo(
+    restApis: APIGateway.RestApi[], swaggerDescription?: string, error?: AWSError,
+  ): void {
     const apiGatewayMock: APIGateway = <APIGateway> {
-      getExport: (params: APIGateway.Types.GetExportRequest, callback: (error?: AWSError, data?: APIGateway.Types.ExportResponse) => void): void => {
+      getExport: (
+        params: APIGateway.Types.GetExportRequest,
+        callback: (error?: AWSError, data?: APIGateway.Types.ExportResponse) => void,
+      ): void => {
         const data: APIGateway.ExportResponse = {
-          body: swaggerDescription
+          body: swaggerDescription,
         };
         callback(error, data);
       },
-      getRestApis: (callback: (error?: AWSError, data?: APIGateway.Types.RestApis) => void): void => {
+      getRestApis: (
+        callback: (error?: AWSError, data?: APIGateway.Types.RestApis) => void,
+      ): void => {
         const data: APIGateway.RestApis = {
-          items: restApis
+          items: restApis,
         };
         callback(error, data);
-      }
+      },
     };
     repo = new SwaggerRepository(apiGatewayMock);
   }
